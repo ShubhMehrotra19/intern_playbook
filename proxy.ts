@@ -8,12 +8,12 @@ export function proxy(request: NextRequest) {
     // Paths that require authentication
     if (pathname.startsWith('/dashboard')) {
         if (!token) {
-            return NextResponse.redirect(new URL('/auth', request.url));
+            return NextResponse.redirect(new URL('/auth/user/login', request.url));
         }
     }
 
     // Paths that are for guests only
-    if (pathname.startsWith('/auth')) {
+    if (pathname.startsWith('/auth/user/login')) {
         if (token) {
             return NextResponse.redirect(new URL('/dashboard', request.url));
         }
@@ -23,7 +23,7 @@ export function proxy(request: NextRequest) {
         if (token) {
             return NextResponse.redirect(new URL('/dashboard', request.url));
         } else {
-            return NextResponse.redirect(new URL('/auth', request.url));
+            return NextResponse.redirect(new URL('/auth/user/login', request.url));
         }
     }
 
@@ -31,5 +31,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/auth', '/'],
+    matcher: ['/dashboard/:path*', '/auth/user/login', '/'],
 };

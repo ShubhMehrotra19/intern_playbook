@@ -106,8 +106,8 @@ export default function AdminDashboard({ user }: { user: any }) {
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-            <nav className="border-b border-border bg-background/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="h-screen flex flex-col bg-background text-foreground transition-colors duration-300 overflow-hidden">
+            <nav className="border-b border-border bg-background flex-shrink-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center space-x-3">
@@ -124,10 +124,10 @@ export default function AdminDashboard({ user }: { user: any }) {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                <div className="flex flex-col md:flex-row gap-8">
+            <main className="flex-1 flex overflow-hidden w-full max-w-7xl mx-auto px-4">
+                <div className="flex flex-col md:flex-row gap-8 w-full h-full">
                     {/* Sidebar */}
-                    <div className="w-full md:w-64 space-y-2">
+                    <div className="w-full md:w-64 space-y-2 flex-shrink-0 overflow-y-auto py-8">
                         <h3 className="text-xs font-bold text-gray-500 uppercase px-3 mb-2 cursor-pointer">Domains</h3>
                         {['Program', 'HR', 'IT', 'Sales', 'RM'].map((d) => (
                             <button
@@ -141,7 +141,7 @@ export default function AdminDashboard({ user }: { user: any }) {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1">
+                    <div className="flex-1 h-full overflow-y-auto py-8">
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className="text-2xl font-bold">{selectedDomain} Dashboard</h2>

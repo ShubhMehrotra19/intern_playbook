@@ -30,6 +30,9 @@ export default function RootLayout({
         >
           <AuthProvider>
             {children}
+            <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+            {/* @ts-ignore */}
+            <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmjbqkby0002m1tb7vusfoo7s'></zapier-interfaces-chatbot-embed>
           </AuthProvider>
         </ThemeProvider>
       </body>

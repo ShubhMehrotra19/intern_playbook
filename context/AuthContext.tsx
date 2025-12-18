@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const logout = async () => {        // Call logout API to clear cookie
         await fetch('/api/auth/logout', { method: 'POST' });
         setUser(null);
-        router.push('/auth');
+        router.push('/user/login');
     };
 
     return (
