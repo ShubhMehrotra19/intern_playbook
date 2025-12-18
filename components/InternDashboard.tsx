@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { LogOut, Trophy, CheckCircle, ExternalLink, PlayCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { ThemeToggle } from './ThemeToggle';
 
 interface Task {
     _id: string;
@@ -63,24 +64,25 @@ export default function InternDashboard({ user }: { user: any }) {
         : 0;
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white font-sans">
+        <div className="min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
             {/* Navbar */}
-            <nav className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+            <nav className="border-b border-border bg-background/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center space-x-3">
-                            <div className="bg-indigo-600 p-2 rounded-lg">
+                            <div className="bg-primary p-2 rounded-lg text-primary-foreground">
                                 <span className="font-bold text-xl">IP</span>
                             </div>
                             <span className="font-semibold text-lg hidden sm:block">Intern Playbook</span>
-                            <span className="bg-gray-800 text-xs px-2 py-1 rounded text-gray-400 border border-gray-700">{user.domain} PoD</span>
+                            <span className="bg-muted text-xs px-2 py-1 rounded text-muted-foreground border border-border">{user.domain} PoD</span>
                         </div>
                         <div className="flex items-center space-x-6">
-                            <div className="flex flex-col items-end">
+                            <div className="hidden md:flex flex-col items-end">
                                 <span className="text-sm font-medium">{user.name}</span>
-                                <span className="text-xs text-indigo-400 font-bold">{user.xp} XP • Lvl {Math.floor(user.xp / 500) + 1}</span>
+                                <span className="text-xs text-primary font-bold">{user.xp !== undefined ? user.xp : 0} XP • Lvl {user.xp !== undefined ? Math.floor(user.xp / 500) + 1 : 0}</span>
                             </div>
-                            <button onClick={logout} className="text-gray-400 hover:text-white transition-colors">
+                            <ThemeToggle />
+                            <button onClick={logout} className="text-muted-foreground hover:text-foreground transition-colors">
                                 <LogOut size={20} />
                             </button>
                         </div>
@@ -117,13 +119,13 @@ export default function InternDashboard({ user }: { user: any }) {
 
                     <motion.div
                         initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
-                        className="bg-gray-800 rounded-3xl p-6 border border-gray-700 flex flex-col items-center justify-center text-center"
+                        className="bg-card rounded-3xl p-6 border border-border flex flex-col items-center justify-center text-center"
                     >
-                        <div className="w-24 h-24 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4 ring-4 ring-indigo-500/20">
-                            <span className="text-4xl font-bold text-indigo-400">{Math.floor(user.xp / 500) + 1}</span>
+                        <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4 ring-4 ring-primary/20">
+                            <span className="text-4xl font-bold text-primary">{Math.floor(user.xp / 500) + 1}</span>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-200">Current Level</h3>
-                        <p className="text-gray-500 text-sm">Next level at {Math.ceil((user.xp + 1) / 500) * 500} XP</p>
+                        <h3 className="text-lg font-semibold text-foreground">Current Level</h3>
+                        <p className="text-muted-foreground text-sm">Next level at {Math.ceil((user.xp + 1) / 500) * 500} XP</p>
                     </motion.div>
                 </div>
 
@@ -131,13 +133,13 @@ export default function InternDashboard({ user }: { user: any }) {
                 <div>
                     <h2 className="text-2xl font-bold mb-6 flex items-center">
                         Your Mission
-                        <span className="bg-gray-800 text-xs ml-3 px-2 py-1 rounded-full text-gray-400">{tasks.length} Tasks</span>
+                        <span className="bg-muted text-xs ml-3 px-2 py-1 rounded-full text-muted-foreground border border-border">{tasks.length} Tasks</span>
                     </h2>
 
                     {loading ? (
                         <div className="text-center py-12 text-gray-500">Loading tasks...</div>
                     ) : tasks.length === 0 ? (
-                        <div className="text-center py-12 text-gray-500 bg-gray-800/50 rounded-2xl border border-dashed border-gray-700">
+                        <div className="text-center py-12 text-muted-foreground bg-card/50 rounded-2xl border border-dashed border-border">
                             No tasks assigned yet. Enjoy the chill time! ☕
                         </div>
                     ) : (
@@ -150,11 +152,11 @@ export default function InternDashboard({ user }: { user: any }) {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.05 }}
-                                        className={`group relative bg-gray-800 rounded-2xl p-6 border transition-all hover:border-indigo-500/50 ${completed ? 'border-green-500/30 opacity-75' : 'border-gray-700'}`}
+                                        className={`group relative bg-card rounded-2xl p-6 border transition-all hover:border-primary/50 shadow-sm ${completed ? 'border-green-500/30 opacity-75' : 'border-border'}`}
                                     >
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <h3 className={`text-xl font-bold ${completed ? 'text-green-400 line-through' : 'text-white'}`}>{task.name}</h3>
+                                                <h3 className={`text-xl font-bold ${completed ? 'text-green-500 line-through' : 'text-card-foreground'}`}>{task.name}</h3>
                                                 <div className="flex items-center space-x-2 mt-2">
                                                     <span className="text-xs bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded font-medium">+{task.xpReward} XP</span>
                                                     {task.video && <span className="text-xs bg-red-500/10 text-red-400 px-2 py-1 rounded flex items-center"><PlayCircle size={12} className="mr-1" /> Video</span>}
@@ -163,7 +165,7 @@ export default function InternDashboard({ user }: { user: any }) {
                                             <button
                                                 onClick={() => !completed && handleComplete(task._id, task.xpReward)}
                                                 disabled={completed}
-                                                className={`p-3 rounded-xl transition-all ${completed ? 'bg-green-500 text-white cursor-default' : 'bg-gray-700 text-gray-400 hover:bg-indigo-600 hover:text-white'}`}
+                                                className={`p-3 rounded-xl transition-all ${completed ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 cursor-default' : 'bg-secondary text-muted-foreground hover:bg-primary hover:text-primary-foreground'}`}
                                             >
                                                 <CheckCircle size={24} />
                                             </button>
@@ -171,8 +173,8 @@ export default function InternDashboard({ user }: { user: any }) {
 
                                         <div className="space-y-3">
                                             {task.tips && (
-                                                <div className="bg-black/20 p-3 rounded-lg text-sm text-gray-400">
-                                                    <span className="font-bold text-gray-200 block mb-1">💡 Pro Tip:</span>
+                                                <div className="bg-muted p-3 rounded-lg text-sm text-muted-foreground">
+                                                    <span className="font-bold text-foreground block mb-1">💡 Pro Tip:</span>
                                                     {task.tips}
                                                 </div>
                                             )}

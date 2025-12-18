@@ -10,19 +10,28 @@ export const metadata: Metadata = {
   description: "Scaler Intern Onboarding System",
 };
 
+import { ThemeProvider } from "@/providers/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.className} antialiased bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100`}
+        className={`${inter.className} antialiased bg-background text-foreground transition-colors duration-300`}
       >
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

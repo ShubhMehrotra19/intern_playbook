@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -11,6 +12,7 @@ export default function AuthPage() {
     const [name, setName] = useState(''); // Only for signup
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const { login, signup } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -47,24 +49,24 @@ export default function AuthPage() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4 py-12 text-white sm:px-6 lg:px-8 relative overflow-hidden">
+        <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 text-foreground sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
             {/* Background Gradients */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
                 <div className="absolute -top-1/2 -left-1/2 w-[1000px] h-[1000px] bg-purple-900/30 rounded-full blur-3xl opacity-50 animate-pulse"></div>
                 <div className="absolute top-1/2 right-0 w-[800px] h-[800px] bg-blue-900/20 rounded-full blur-3xl opacity-50"></div>
             </div>
 
-            <div className="w-full max-w-md space-y-8 z-10 p-8 glass-panel rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md bg-white/5">
+            <div className="w-full max-w-md space-y-8 z-10 p-8 glass-panel rounded-2xl border border-border shadow-2xl bg-card/50 backdrop-blur-xl">
                 <div className="text-center">
                     <motion.h2
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="mt-6 text-3xl font-bold tracking-tight text-white"
+                        className="mt-6 text-3xl font-bold tracking-tight text-foreground"
                     >
                         Intern Playbook
                     </motion.h2>
-                    <p className="mt-2 text-sm text-gray-400">
+                    <p className="mt-2 text-sm text-muted-foreground">
                         {isLogin ? 'Sign in to access your dashboard' : 'Join the Scaler Intern Program'}
                     </p>
                 </div>
@@ -72,13 +74,13 @@ export default function AuthPage() {
                 <div className="flex justify-center space-x-4 mb-6">
                     <button
                         onClick={() => setIsLogin(true)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${isLogin ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${isLogin ? 'bg-primary text-primary-foreground shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                         Login
                     </button>
                     <button
                         onClick={() => setIsLogin(false)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!isLogin ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!isLogin ? 'bg-primary text-primary-foreground shadow-lg' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                         Start Journey
                     </button>
@@ -105,7 +107,7 @@ export default function AuthPage() {
                                         name="name"
                                         type="text"
                                         required
-                                        className="relative block w-full rounded-lg border-0 bg-white/10 px-3 py-3 text-white placeholder-gray-400 focus:z-10 focus:ring-2 focus:ring-indigo-500 hover:bg-white/20 transition-colors sm:text-sm"
+                                        className="relative block w-full rounded-lg border-0 bg-secondary px-3 py-3 text-foreground placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-primary hover:bg-secondary/80 transition-colors sm:text-sm"
                                         placeholder="Full Name"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
@@ -122,27 +124,34 @@ export default function AuthPage() {
                                     type="email"
                                     autoComplete="email"
                                     required
-                                    className="relative block w-full rounded-lg border-0 bg-white/10 px-3 py-3 text-white placeholder-gray-400 focus:z-10 focus:ring-2 focus:ring-indigo-500 hover:bg-white/20 transition-colors sm:text-sm"
+                                    className="relative block w-full rounded-lg border-0 bg-secondary px-3 py-3 text-foreground placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-primary hover:bg-secondary/80 transition-colors sm:text-sm"
                                     placeholder="Email address (@scaler.com)"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
-                            <div>
+                            <div className="relative">
                                 <label htmlFor="password" className="sr-only">
                                     Password
                                 </label>
                                 <input
                                     id="password"
                                     name="password"
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     autoComplete={isLogin ? 'current-password' : 'new-password'}
                                     required
-                                    className="relative block w-full rounded-lg border-0 bg-white/10 px-3 py-3 text-white placeholder-gray-400 focus:z-10 focus:ring-2 focus:ring-indigo-500 hover:bg-white/20 transition-colors sm:text-sm"
+                                    className="relative block w-full rounded-lg border-0 bg-secondary px-3 py-3 text-foreground placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-primary hover:bg-secondary/80 transition-colors sm:text-sm pr-10"
                                     placeholder="Password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
                             </div>
                         </div>
 
