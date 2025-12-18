@@ -11,8 +11,10 @@ export default function AdminDashboard({ user }: { user: any }) {
     const [selectedDomain, setSelectedDomain] = useState('Program');
     const [tasks, setTasks] = useState<any[]>([]);
     const [users, setUsers] = useState<any[]>([]);
-    const [activeTab, setActiveTab] = useState<'tasks' | 'users'>('tasks');
+    const [resources, setResources] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<'tasks' | 'users' | 'resources'>('tasks');
     const [showTaskForm, setShowTaskForm] = useState(false);
+    const [showResourceForm, setShowResourceForm] = useState(false);
     const [editingTask, setEditingTask] = useState<any | null>(null);
 
     // Form State
@@ -25,11 +27,19 @@ export default function AdminDashboard({ user }: { user: any }) {
         xpReward: 100
     });
 
+    const [newResource, setNewResource] = useState({
+        title: '',
+        description: '',
+        link: ''
+    });
+
     useEffect(() => {
         if (activeTab === 'tasks') {
             fetchTasks();
-        } else {
+        } else if (activeTab === 'users') {
             fetchUsers();
+        } else if (activeTab === 'resources') {
+            fetchResources();
         }
     }, [selectedDomain, activeTab]);
 
@@ -46,6 +56,35 @@ export default function AdminDashboard({ user }: { user: any }) {
             setUsers(data.users || []);
         } catch (error) {
             console.error('Failed to fetch users', error);
+        }
+    };
+
+    const fetchResources = async () => {
+        try {
+            const res = await fetch('/api/resources');
+            const data = await res.json();
+            setResources(data.resources || []);
+        } catch (error) {
+            console.error('Failed to fetch resources', error);
+        }
+    };
+
+    const handleCreateResource = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const res = await fetch('/api/resources', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newResource)
+            });
+
+            if (res.ok) {
+                setShowResourceForm(false);
+                setNewResource({ title: '', description: '', link: '' });
+                fetchResources();
+            }
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -153,6 +192,12 @@ export default function AdminDashboard({ user }: { user: any }) {
                                         Tasks
                                     </button>
                                     <button
+                                        onClick={() => setActiveTab('resources')}
+                                        className={`text-sm font-medium pb-1 border-b-2 transition-colors ${activeTab === 'resources' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                                    >
+                                        Resources
+                                    </button>
+                                    <button
                                         onClick={() => setActiveTab('users')}
                                         className={`text-sm font-medium pb-1 border-b-2 transition-colors ${activeTab === 'users' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                                     >
@@ -166,6 +211,14 @@ export default function AdminDashboard({ user }: { user: any }) {
                                     className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all shadow-sm active:scale-95 cursor-pointer"
                                 >
                                     <Plus size={16} className="mr-2" /> Add Task
+                                </button>
+                            )}
+                            {activeTab === 'resources' && (
+                                <button
+                                    onClick={() => setShowResourceForm(true)}
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all shadow-sm active:scale-95 cursor-pointer"
+                                >
+                                    <Plus size={16} className="mr-2" /> Add Resource
                                 </button>
                             )}
                         </div>
@@ -208,10 +261,24 @@ export default function AdminDashboard({ user }: { user: any }) {
                                             </button>
                                         </div>
                                     </div>
-
-                                ))
-                                }
+                                ))}
                                 {tasks.length === 0 && <div className="text-muted-foreground text-center py-8">No tasks found for {selectedDomain}</div>}
+                            </div>
+                        ) : activeTab === 'resources' ? (
+                            <div className="grid gap-4">
+                                {resources.map((resource) => (
+                                    <div
+                                        key={resource._id}
+                                        className="bg-card p-4 rounded-xl border border-border shadow-sm flex justify-between items-center transition-colors"
+                                    >
+                                        <div>
+                                            <h3 className="font-bold text-foreground">{resource.title}</h3>
+                                            <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{resource.description}</p>
+                                        </div>
+                                        <a href={resource.link} target="_blank" className="text-primary text-sm hover:underline">Link</a>
+                                    </div>
+                                ))}
+                                {resources.length === 0 && <div className="text-muted-foreground text-center py-8">No resources found.</div>}
                             </div>
                         ) : (
                             /* Users List */
@@ -258,59 +325,98 @@ export default function AdminDashboard({ user }: { user: any }) {
                         )}
                     </div>
                 </div>
-            </main>
+            </main >
 
             {/* Create Task Modal */}
             <AnimatePresence>
-                {showTaskForm && (
-                    <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                    >
+                {
+                    showTaskForm && (
                         <motion.div
-                            initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
-                            className="bg-gray-800 rounded-2xl w-full max-w-lg p-6 border border-gray-700 max-h-[90vh] overflow-y-auto"
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
                         >
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-bold">{editingTask ? 'Edit Task' : `New Task for ${selectedDomain}`}</h3>
-                                <button onClick={() => setShowTaskForm(false)} className="text-gray-400 hover:text-white"><Plus size={24} className="rotate-45" /></button>
-                            </div>
+                            <motion.div
+                                initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+                                className="bg-gray-800 rounded-2xl w-full max-w-lg p-6 border border-gray-700 max-h-[90vh] overflow-y-auto"
+                            >
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-bold">{editingTask ? 'Edit Task' : `New Task for ${selectedDomain}`}</h3>
+                                    <button onClick={() => setShowTaskForm(false)} className="text-gray-400 hover:text-white"><Plus size={24} className="rotate-45" /></button>
+                                </div>
 
-                            <form onSubmit={handleCreateOrUpdateTask} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm text-gray-400 mb-1">Task Name</label>
-                                    <input required type="text" value={newTask.name} onChange={e => setNewTask({ ...newTask, name: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm text-gray-400 mb-1">Tips / Description</label>
-                                    <textarea value={newTask.tips} onChange={e => setNewTask({ ...newTask, tips: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" rows={3} />
-                                </div>
-                                <div>
-                                    <label className="block text-sm text-gray-400 mb-1">Resource Link</label>
-                                    <input type="url" value={newTask.link} onChange={e => setNewTask({ ...newTask, link: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" placeholder="https://..." />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <form onSubmit={handleCreateOrUpdateTask} className="space-y-4">
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-1">XP Reward</label>
-                                        <input type="number" value={newTask.xpReward} onChange={e => setNewTask({ ...newTask, xpReward: Number(e.target.value) })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
+                                        <label className="block text-sm text-gray-400 mb-1">Task Name</label>
+                                        <input required type="text" value={newTask.name} onChange={e => setNewTask({ ...newTask, name: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm text-gray-400 mb-1">Video Link (Optional)</label>
-                                        <input type="text" value={newTask.video} onChange={e => setNewTask({ ...newTask, video: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
+                                        <label className="block text-sm text-gray-400 mb-1">Tips / Description</label>
+                                        <textarea value={newTask.tips} onChange={e => setNewTask({ ...newTask, tips: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" rows={3} />
                                     </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm text-gray-400 mb-1">Images (Comma separated URLs)</label>
-                                    <input type="text" value={newTask.images} onChange={e => setNewTask({ ...newTask, images: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" placeholder="url1, url2" />
-                                </div>
-                                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg mt-4">
-                                    {editingTask ? 'Update Task' : 'Create Task'}
-                                </button>
-                            </form>
+                                    <div>
+                                        <label className="block text-sm text-gray-400 mb-1">Resource Link</label>
+                                        <input type="url" value={newTask.link} onChange={e => setNewTask({ ...newTask, link: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" placeholder="https://..." />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm text-gray-400 mb-1">XP Reward</label>
+                                            <input type="number" value={newTask.xpReward} onChange={e => setNewTask({ ...newTask, xpReward: Number(e.target.value) })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm text-gray-400 mb-1">Video Link (Optional)</label>
+                                            <input type="text" value={newTask.video} onChange={e => setNewTask({ ...newTask, video: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-gray-400 mb-1">Images (Comma separated URLs)</label>
+                                        <input type="text" value={newTask.images} onChange={e => setNewTask({ ...newTask, images: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" placeholder="url1, url2" />
+                                    </div>
+                                    <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg mt-4">
+                                        {editingTask ? 'Update Task' : 'Create Task'}
+                                    </button>
+                                </form>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+                    )
+                }
+
+                {
+                    showResourceForm && (
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        >
+                            <motion.div
+                                initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+                                className="bg-gray-800 rounded-2xl w-full max-w-lg p-6 border border-gray-700 max-h-[90vh] overflow-y-auto"
+                            >
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-bold">New Resource</h3>
+                                    <button onClick={() => setShowResourceForm(false)} className="text-gray-400 hover:text-white"><Plus size={24} className="rotate-45" /></button>
+                                </div>
+
+                                <form onSubmit={handleCreateResource} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm text-gray-400 mb-1">Title</label>
+                                        <input required type="text" value={newResource.title} onChange={e => setNewResource({ ...newResource, title: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-gray-400 mb-1">Description</label>
+                                        <textarea required value={newResource.description} onChange={e => setNewResource({ ...newResource, description: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" rows={3} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-gray-400 mb-1">Link</label>
+                                        <input required type="url" value={newResource.link} onChange={e => setNewResource({ ...newResource, link: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" placeholder="https://..." />
+                                    </div>
+                                    <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg mt-4">
+                                        Create Resource
+                                    </button>
+                                </form>
+                            </motion.div>
+                        </motion.div>
+                    )
+                }
+            </AnimatePresence >
+        </div >
     );
 }
