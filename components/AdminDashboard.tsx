@@ -128,12 +128,12 @@ export default function AdminDashboard({ user }: { user: any }) {
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar */}
                     <div className="w-full md:w-64 space-y-2">
-                        <h3 className="text-xs font-bold text-gray-500 uppercase px-3 mb-2">Domains</h3>
+                        <h3 className="text-xs font-bold text-gray-500 uppercase px-3 mb-2 cursor-pointer">Domains</h3>
                         {['Program', 'HR', 'IT', 'Sales', 'RM'].map((d) => (
                             <button
                                 key={d}
                                 onClick={() => setSelectedDomain(d)}
-                                className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedDomain === d ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'}`}
+                                className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedDomain === d ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground cursor-pointer'}`}
                             >
                                 {d}
                             </button>
@@ -163,7 +163,7 @@ export default function AdminDashboard({ user }: { user: any }) {
                             {activeTab === 'tasks' && (
                                 <button
                                     onClick={openCreateModal}
-                                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all shadow-sm active:scale-95"
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all shadow-sm active:scale-95 cursor-pointer"
                                 >
                                     <Plus size={16} className="mr-2" /> Add Task
                                 </button>
@@ -174,23 +174,41 @@ export default function AdminDashboard({ user }: { user: any }) {
                         {activeTab === 'tasks' ? (
                             <div className="grid gap-4">
                                 {tasks.map((task) => (
-                                    <div key={task._id} className="bg-card p-4 rounded-xl border border-border shadow-sm flex justify-between items-center transition-colors hover:border-primary/20">
-                                        <div>
-                                            <h3 className="font-bold text-foreground">{task.name}</h3>
-                                            <p className="text-xs text-muted-foreground mt-1">{task.tips || 'No summary'}</p>
+                                    <div
+                                        key={task._id}
+                                        className="bg-card p-4 rounded-xl border border-border shadow-sm flex justify-between items-center transition-colors hover:border-primary/20"
+                                    >
+                                        <div className="max-w-[75%]">
+                                            <h3 className="font-bold text-foreground">
+                                                {task.name}
+                                            </h3>
+
+                                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                                {task.tips || 'No summary'}
+                                            </p>
                                         </div>
+
                                         <div className="text-right flex items-center space-x-3">
                                             <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-bold border border-primary/20">
                                                 {task.xpReward} XP
                                             </span>
-                                            <button onClick={() => handleEditClick(task)} className="text-muted-foreground hover:text-primary transition-colors">
+
+                                            <button
+                                                onClick={() => handleEditClick(task)}
+                                                className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                            >
                                                 <Pencil size={16} />
                                             </button>
-                                            <button onClick={() => handleDeleteTask(task._id)} className="text-muted-foreground hover:text-destructive transition-colors">
+
+                                            <button
+                                                onClick={() => handleDeleteTask(task._id)}
+                                                className="text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                                            >
                                                 <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </div>
+
                                 ))
                                 }
                                 {tasks.length === 0 && <div className="text-muted-foreground text-center py-8">No tasks found for {selectedDomain}</div>}

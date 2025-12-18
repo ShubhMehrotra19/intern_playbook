@@ -52,9 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!loading) {
             if (!user && pathname.startsWith('/dashboard')) {
                 router.push('/auth');
-            } else if (user && pathname === '/auth') {
+            } else if (user && pathname === '/user/login') {
                 router.push('/dashboard');
-            } else if (user && pathname === '/') {
+            } else if (user && pathname === '/user/signup') {
                 router.push('/dashboard');
             }
         }
@@ -71,9 +71,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         router.push('/dashboard');
     };
 
-    const logout = async () => {
-        // Call logout API to clear cookie
-        await fetch('/api/auth/logout', { method: 'POST' }); // We need to make this route
+    const logout = async () => {        // Call logout API to clear cookie
+        await fetch('/api/auth/logout', { method: 'POST' });
         setUser(null);
         router.push('/auth');
     };
