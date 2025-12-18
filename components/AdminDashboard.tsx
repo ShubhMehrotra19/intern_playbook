@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { LogOut, Plus, Users, Layout, Trash2, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AdminDashboard({ user }: { user: any }) {
     const { logout } = useAuth();
@@ -105,17 +106,20 @@ export default function AdminDashboard({ user }: { user: any }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white">
-            <nav className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+            <nav className="border-b border-border bg-background/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex items-center space-x-3">
-                            <span className="font-bold text-xl text-yellow-500">ADMIN</span>
-                            <span className="font-semibold text-lg hidden sm:block">Intern Playbook</span>
+                            <span className="font-bold text-xl text-primary">ADMIN</span>
+                            <span className="font-semibold text-lg hidden sm:block text-foreground">Intern Playbook</span>
                         </div>
-                        <button onClick={logout} className="text-gray-400 hover:text-white transition-colors">
-                            <LogOut size={20} />
-                        </button>
+                        <div className="flex items-center space-x-4">
+                            <ThemeToggle />
+                            <button onClick={logout} className="text-muted-foreground hover:text-foreground transition-colors">
+                                <LogOut size={20} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -129,7 +133,7 @@ export default function AdminDashboard({ user }: { user: any }) {
                             <button
                                 key={d}
                                 onClick={() => setSelectedDomain(d)}
-                                className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedDomain === d ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+                                className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedDomain === d ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'}`}
                             >
                                 {d}
                             </button>
@@ -144,13 +148,13 @@ export default function AdminDashboard({ user }: { user: any }) {
                                 <div className="flex space-x-4 mt-2">
                                     <button
                                         onClick={() => setActiveTab('tasks')}
-                                        className={`text-sm font-medium pb-1 border-b-2 transition-colors ${activeTab === 'tasks' ? 'border-indigo-500 text-white' : 'border-transparent text-gray-400 hover:text-white'}`}
+                                        className={`text-sm font-medium pb-1 border-b-2 transition-colors ${activeTab === 'tasks' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                                     >
                                         Tasks
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('users')}
-                                        className={`text-sm font-medium pb-1 border-b-2 transition-colors ${activeTab === 'users' ? 'border-indigo-500 text-white' : 'border-transparent text-gray-400 hover:text-white'}`}
+                                        className={`text-sm font-medium pb-1 border-b-2 transition-colors ${activeTab === 'users' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                                     >
                                         Leaderboard & Progress
                                     </button>
@@ -159,7 +163,7 @@ export default function AdminDashboard({ user }: { user: any }) {
                             {activeTab === 'tasks' && (
                                 <button
                                     onClick={openCreateModal}
-                                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all"
+                                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all shadow-sm active:scale-95"
                                 >
                                     <Plus size={16} className="mr-2" /> Add Task
                                 </button>
@@ -170,31 +174,32 @@ export default function AdminDashboard({ user }: { user: any }) {
                         {activeTab === 'tasks' ? (
                             <div className="grid gap-4">
                                 {tasks.map((task) => (
-                                    <div key={task._id} className="bg-gray-800 p-4 rounded-xl border border-gray-700 flex justify-between items-center">
+                                    <div key={task._id} className="bg-card p-4 rounded-xl border border-border shadow-sm flex justify-between items-center transition-colors hover:border-primary/20">
                                         <div>
-                                            <h3 className="font-bold">{task.name}</h3>
-                                            <p className="text-xs text-gray-400 mt-1">{task.tips || 'No summary'}</p>
+                                            <h3 className="font-bold text-foreground">{task.name}</h3>
+                                            <p className="text-xs text-muted-foreground mt-1">{task.tips || 'No summary'}</p>
                                         </div>
                                         <div className="text-right flex items-center space-x-3">
-                                            <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full font-bold border border-indigo-500/30">
+                                            <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-bold border border-primary/20">
                                                 {task.xpReward} XP
                                             </span>
-                                            <button onClick={() => handleEditClick(task)} className="text-gray-400 hover:text-white transition-colors">
+                                            <button onClick={() => handleEditClick(task)} className="text-muted-foreground hover:text-primary transition-colors">
                                                 <Pencil size={16} />
                                             </button>
-                                            <button onClick={() => handleDeleteTask(task._id)} className="text-gray-400 hover:text-red-400 transition-colors">
+                                            <button onClick={() => handleDeleteTask(task._id)} className="text-muted-foreground hover:text-destructive transition-colors">
                                                 <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </div>
-                                ))}
-                                {tasks.length === 0 && <div className="text-gray-500 text-center py-8">No tasks found for {selectedDomain}</div>}
+                                ))
+                                }
+                                {tasks.length === 0 && <div className="text-muted-foreground text-center py-8">No tasks found for {selectedDomain}</div>}
                             </div>
                         ) : (
                             /* Users List */
-                            <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+                            <div className="bg-card rounded-xl border border-border overflow-hidden">
                                 <table className="w-full text-left">
-                                    <thead className="bg-gray-700/50 text-gray-400 text-xs uppercase">
+                                    <thead className="bg-muted text-muted-foreground text-xs uppercase">
                                         <tr>
                                             <th className="px-6 py-3">Rank</th>
                                             <th className="px-6 py-3">Intern</th>
@@ -210,10 +215,10 @@ export default function AdminDashboard({ user }: { user: any }) {
                                                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <div className="font-medium text-white">{u.name}</div>
-                                                    <div className="text-xs text-gray-500">{u.email}</div>
+                                                    <div className="font-medium text-foreground">{u.name}</div>
+                                                    <div className="text-xs text-muted-foreground">{u.email}</div>
                                                 </td>
-                                                <td className="px-6 py-4 font-bold text-indigo-400">{u.xp} XP</td>
+                                                <td className="px-6 py-4 font-bold text-primary">{u.xp} XP</td>
                                                 <td className="px-6 py-4">
                                                     <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-bold">
                                                         {u.completedTasks?.length || 0}
