@@ -2,18 +2,17 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_dev_only';
-
-// Hardcoded admin credentials backup logic (only if not in DB)
 const ADMIN_EMAIL = 'shubh.mehrotra@scaler.com';
 const ADMIN_PASS = 'internadmin';
 
 export async function POST(req: Request) {
     try {
         await dbConnect();
-        const { email, password } = await req.json();
+
+        const body = await req.json();
+        const { email, password } = body;
 
         if (!email || !password) {
             return NextResponse.json(
@@ -22,30 +21,43 @@ export async function POST(req: Request) {
             );
         }
 
-        // Special case for default admin if not exists in DB yet
+        // 1. Check Hardcoded Admin / Recovery Logic
         if (email === ADMIN_EMAIL) {
             let adminUser = await User.findOne({ email: ADMIN_EMAIL }).select('+password');
+
+            // If admin doesn't exist in DB, create on the fly (First run setup)
             if (!adminUser) {
-                // Create the default admin on the fly if he logs in and doesn't exist
-                // SECURITY NOTE: In a real app we might seed this differently, but per requirements
-                // we need this user to exist.
                 if (password === ADMIN_PASS) {
-                    adminUser = await User.create({
-                        name: 'Super Admin',
-                        email: ADMIN_EMAIL,
-                        password: ADMIN_PASS, // will be hashed by hook
-                        role: 'admin',
-                        domain: 'None' // Admins might not have a specific domain or 'All'
-                    });
+                    try {
+                        adminUser = await User.create({
+                            name: 'Super Admin',
+                            email: ADMIN_EMAIL,
+                            password: ADMIN_PASS,
+                            role: 'admin',
+                            domain: 'None'
+                        });
+                        console.log('Admin user created successfully');
+                    } catch (err) {
+                        console.error('Error creating default admin:', err);
+                        return NextResponse.json(
+                            { message: 'Failed to create default admin' },
+                            { status: 500 }
+                        );
+                    }
                 } else {
                     return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
                 }
             }
 
-            // Verify password for admin (whether just created or existing)
+            // Verify password
             const isMatch = await adminUser.comparePassword(password);
             if (!isMatch) {
                 return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+            }
+
+            // Check if purely admin login is requested (optional security), but here we just ensure role is admin
+            if (adminUser.role !== 'admin') {
+                return NextResponse.json({ message: 'Access denied: Not an admin' }, { status: 403 });
             }
 
             const token = jwt.sign(
@@ -55,7 +67,7 @@ export async function POST(req: Request) {
             );
 
             const response = NextResponse.json(
-                { message: 'Login successful', user: { name: adminUser.name, email: adminUser.email, role: adminUser.role } },
+                { message: 'Admin Login successful', user: { name: adminUser.name, email: adminUser.email, role: adminUser.role } },
                 { status: 200 }
             );
 
@@ -69,21 +81,17 @@ export async function POST(req: Request) {
             return response;
         }
 
-        // Normal User Login
+        // If not the hardcoded admin email, check if it's another admin stored in DB
         const user = await User.findOne({ email }).select('+password');
-        if (!user) {
-            return NextResponse.json(
-                { message: 'Invalid credentials' },
-                { status: 401 }
-            );
+        if (!user || user.role !== 'admin') {
+            // We return generic invalid creds or 403 to avoid leaking existence, 
+            // but for now 403/401 is fine.
+            return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
         }
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return NextResponse.json(
-                { message: 'Invalid credentials' },
-                { status: 401 }
-            );
+            return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
         }
 
         const token = jwt.sign(
@@ -93,7 +101,7 @@ export async function POST(req: Request) {
         );
 
         const response = NextResponse.json(
-            { message: 'Login successful', user: { name: user.name, email: user.email, role: user.role } },
+            { message: 'Admin Login successful', user: { name: user.name, email: user.email, role: user.role } },
             { status: 200 }
         );
 
@@ -105,10 +113,11 @@ export async function POST(req: Request) {
         });
 
         return response;
-    } catch (error) {
-        console.error('Login error:', error);
+
+    } catch (error: any) {
+        console.error('Admin Login Error:', error);
         return NextResponse.json(
-            { message: 'Internal Server Error' },
+            { message: 'Internal Server Error', error: error.message },
             { status: 500 }
         );
     }
