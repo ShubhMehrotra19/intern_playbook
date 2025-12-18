@@ -20,12 +20,14 @@ const TaskSchema = new mongoose.Schema(
 
 const Task = mongoose.models.Task || mongoose.model('Task', TaskSchema);
 
+// Data provided by user for "Program" domain
 const allTasks = [
     {
         id: 1,
         name: "Complete Formalities on Darwin Box",
         category: "HR",
         xp: 30,
+        order: 1,
         resources: [
             "Visit Darwin Box portal with your employee credentials",
             "Fill in employee information completely",
@@ -33,12 +35,14 @@ const allTasks = [
             "Ensure all documents are uploaded"
         ],
         links: [],
+        contact: null
     },
     {
         id: 2,
         name: "Access - Slack",
-        category: "IT",
+        category: "Access",
         xp: 25,
+        order: 2,
         resources: [
             "Join Scaler Slack workspace using invite link",
             "Set up your profile with photo and bio",
@@ -47,12 +51,14 @@ const allTasks = [
             "Explore key channels (#general, #announcements)"
         ],
         links: [],
+        contact: null
     },
     {
         id: 3,
         name: "Access - Google Drive",
-        category: "IT",
+        category: "Access",
         xp: 25,
+        order: 3,
         resources: [
             "Accept Google Drive access invitation from HRBP",
             "Verify you can access shared folders",
@@ -60,12 +66,14 @@ const allTasks = [
             "Set up any necessary Drive shortcuts"
         ],
         links: [],
+        contact: "Check email for invitation link"
     },
     {
         id: 4,
         name: "Basics of Communication",
-        category: "Program",
+        category: "Scaler Overview",
         xp: 40,
+        order: 4,
         resources: [
             "Review communication guidelines document",
             "Understand async vs sync communication at Scaler",
@@ -75,12 +83,14 @@ const allTasks = [
         links: [
             { text: "Communication 101 Document", url: "https://docs.google.com/document/d/1vUB6ybKtIO2-KKpy820zscu9uYovwRzQbRc52dz9MNA/edit" }
         ],
+        contact: null
     },
     {
         id: 5,
         name: "Contact HRBP & initiate ID card steps",
         category: "HR",
         xp: 35,
+        order: 5,
         resources: [
             "Reach out to Anushka Jain (HRBP)",
             "Provide high-quality ID photo",
@@ -88,12 +98,14 @@ const allTasks = [
             "Verify delivery address for card"
         ],
         links: [],
+        contact: "Anushka Jain - anushka.jain@scaler.com"
     },
     {
         id: 6,
         name: "Scaler Neovarsity",
-        category: "Program",
+        category: "Scaler Overview",
         xp: 30,
+        order: 6,
         resources: [
             "Explore Scaler Neovarsity platform",
             "Understand curriculum offerings",
@@ -103,12 +115,14 @@ const allTasks = [
         links: [
             { text: "Scaler Neovarsity", url: "https://www.scaler.com/neovarsity/" }
         ],
+        contact: null
     },
     {
         id: 7,
         name: "Familiarization of Google Sheets",
-        category: "Program",
+        category: "Toolkit",
         xp: 20,
+        order: 7,
         resources: [
             "Learn basic spreadsheet functions and formulas",
             "Practice with sample data provided",
@@ -119,12 +133,14 @@ const allTasks = [
         links: [
             { text: "Google Sheets Tutorial for Beginners - YouTube", url: "https://www.youtube.com/watch?v=TENAbUa-R-w" }
         ],
+        contact: null
     },
     {
         id: 8,
         name: "Kapture Introduction",
-        category: "Sales",
+        category: "Toolkit",
         xp: 25,
+        order: 8,
         resources: [
             "Attend onboarding session with Shubham Swarnkar",
             "Learn how to use Kapture call recording system",
@@ -133,12 +149,14 @@ const allTasks = [
             "Set up your Kapture profile"
         ],
         links: [],
+        contact: "Shubham Swarnkar - shubham.swarnkar@scaler.com"
     },
     {
         id: 9,
         name: "Shadow 30 RM Calls",
-        category: "RM",
+        category: "Execution",
         xp: 50,
+        order: 9,
         resources: [
             "Schedule shadowing calls with experienced RMs",
             "Observe customer interaction techniques",
@@ -147,12 +165,14 @@ const allTasks = [
             "Understand sales process and pipeline"
         ],
         links: [],
+        contact: "Coordinate through Zentrix system"
     },
     {
         id: 10,
         name: "Problem Solving 101",
-        category: "Program",
+        category: "Execution",
         xp: 45,
+        order: 10,
         resources: [
             "Review advanced problem-solving frameworks",
             "Understand first-principles thinking",
@@ -163,12 +183,14 @@ const allTasks = [
         links: [
             { text: "Advance Problem Solving Document", url: "https://docs.google.com/spreadsheets/d/1tBrXxr9Y0tF9LNx9WlK84Ju0cSw3hPS6mN8T0CPQ55k/edit" }
         ],
+        contact: null
     },
     {
         id: 11,
         name: "Data Analysis: User Segmentation",
-        category: "Program",
+        category: "Execution",
         xp: 40,
+        order: 11,
         resources: [
             "Analyze user behavior data provided",
             "Create meaningful user segments",
@@ -179,12 +201,14 @@ const allTasks = [
         links: [
             { text: "Analysis: User Segmentation Spreadsheet", url: "https://docs.google.com/spreadsheets/d/1A3ZwhlM6jLQABN3bnMhRF3Knkij6vpfDQl8wooG8gIY/edit" }
         ],
+        contact: null
     },
     {
         id: 12,
         name: "Metabase & Power BI",
-        category: "Program",
+        category: "Execution",
         xp: 40,
+        order: 12,
         resources: [
             "Learn dashboard creation in Metabase",
             "Understand data visualization best practices",
@@ -193,12 +217,14 @@ const allTasks = [
             "Learn Power BI fundamentals and integration"
         ],
         links: [],
+        contact: "Training session with Akash Deep - akash.deep01@scaler.com"
     },
     {
         id: 13,
         name: "Go through learner dashboard",
-        category: "Program",
+        category: "Learner Understanding",
         xp: 25,
+        order: 13,
         resources: [
             "Explore learner dashboard interface",
             "Understand key metrics and their meaning",
@@ -207,12 +233,14 @@ const allTasks = [
             "Learn dashboard customization options"
         ],
         links: [],
+        contact: "Schedule walkthrough with Vagesh Garg - vagesh.garg@scaler.com"
     },
     {
         id: 14,
         name: "Program Flow review",
-        category: "Program",
+        category: "Learner Understanding",
         xp: 20,
+        order: 14,
         resources: [
             "Study the complete program flow diagram",
             "Understand all touchpoints in the program",
@@ -223,12 +251,14 @@ const allTasks = [
         links: [
             { text: "Program Flow Diagram - Whimsical", url: "https://whimsical.com/program-flow-TKfSUhLoyfbgTW7oDfJr3P" }
         ],
+        contact: null
     },
     {
         id: 15,
         name: "Problem Statement Worksheet",
-        category: "Program",
+        category: "Gold Standard",
         xp: 35,
+        order: 15,
         resources: [
             "Complete the problem statement worksheet",
             "Define the user problem clearly",
@@ -239,12 +269,14 @@ const allTasks = [
         links: [
             { text: "Problem Statement Worksheet", url: "https://docs.google.com/spreadsheets/d/1iO-zhkYvIMSqjzXLP-XF5AJ5Ox2pc1T1EVb6Ktg2ARg/edit" }
         ],
+        contact: null
     },
     {
         id: 16,
         name: "Presentation: Project Kick Off",
-        category: "Program",
+        category: "Gold Standard",
         xp: 30,
+        order: 16,
         resources: [
             "Prepare project kick-off presentation",
             "Align on project deliverables and timeline",
@@ -255,12 +287,14 @@ const allTasks = [
         links: [
             { text: "Project Kick Off Presentation Template", url: "https://docs.google.com/presentation/d/1nTK3KjpnKS1aQ_WgjI2NHNjRg53hGD3K/edit" }
         ],
+        contact: null
     },
     {
         id: 17,
         name: "Understanding CMT and HireTest",
-        category: "Program",
+        category: "Gold Standard",
         xp: 15,
+        order: 17,
         resources: [
             "Learn about CMT (Course Management Tool)",
             "Understand HireTest platform functionalities",
@@ -270,6 +304,7 @@ const allTasks = [
         links: [
             { text: "CMT Working Guide", url: "https://drive.google.com/drive/folders/1kxTQQD3n1JlXfDZKlRXnxg1lLD3PjU2_?usp=sharing" }
         ],
+        contact: null
     }
 ];
 
@@ -282,60 +317,20 @@ async function seed() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to DB");
 
-    // Mapping custom categories user provided to standard domains if needed, 
-    // or just assume categories match Domain enum: HR, Program, IT, Sales, RM
-    // User data mixed categories like "Access", "Scaler Overview". 
-    // I will map them as follows:
-    // HR -> HR
-    // Access -> IT
-    // Scaler Overview -> Program (or HR, but Program seems fitting for general onboarding)
-    // Execution -> Program (User explicitly said "put this data inside the program tasks")
-    // Toolkit -> Program
-    // Learner Understanding -> Program
-    // Gold Standard -> Program
-    // Sales -> Sales
-    // RM -> RM
-
-    // WAIT: The user said "put this data inside the PROGRAM tasks". 
-    // That likely refers to the 'Program' PoD domain onboarding.
-    // But the data itself has 'category' keys.
-    // I will map 'HR' to 'HR' domain, 'IT'/'Access' to 'IT' domain, 'Sales' to 'Sales' domain, 'RM' to 'RM' domain.
-    // And everything else to 'Program' domain as requested or default.
-
-    // Actually, looking at the list, most are specifically for Program Interns (Analytis, Problem Solving etc).
-    // Let's seed them primarily as Program tasks unless clearly other domains.
-    // Or better, I will respect the 'category' field mapping to domains where it matches, ensuring they show up in dashboards.
+    // All these tasks are assigned to the 'Program' domain to ensure they are visible to Program interns.
+    // The previous category field is ignored for domain assignment but kept in tips if needed (omitted here for cleanliness).
 
     const tasksToInsert = allTasks.map(t => {
-        let domain = 'Program'; // Default
-        const cat = t.category;
-
-        if (cat === 'HR') domain = 'HR';
-        if (cat === 'Access') domain = 'IT';
-        if (cat === 'Sales') domain = 'Sales';
-        if (cat === 'RM' || t.name.includes("RM Calls")) domain = 'RM';
-        if (t.name.includes("Kapture")) domain = 'Sales'; // Kapture is sales tool
-
-        // Override: Force "Scaler Overview", "Toolkit", "Execution", "Learner Understanding", "Gold Standard" to Program
-        // if they are generic enough. 
-        // Actually, "Access - Slack" is IT. "Access - Drive" is IT.
-        // The user prompted "put this data inside the program tasks".
-        // This might mean "For the Program PoD".
-        // IF I put them all in 'Program', other interns won't see HR/IT tasks.
-        // But HR/IT tasks are common.
-        // Let's create copies for all domains for common tasks? No, too complex.
-
-        // STRATEGY: 
-        // 1. HR tasks -> HR domain
-        // 2. IT tasks -> IT domain
-        // 3. Sales tasks -> Sales domain
-        // 4. Everything else -> Program domain
+        let tips = t.resources.join('\n');
+        if (t.contact) {
+            tips += `\n\nContact: ${t.contact}`;
+        }
 
         return {
             name: t.name,
-            domain: domain,
+            domain: 'Program',
             xpReward: t.xp,
-            tips: t.resources.join('\n'), // bullet points as tips
+            tips: tips,
             link: t.links.length > 0 ? t.links[0].url : '',
             images: [],
             video: ''
@@ -343,9 +338,10 @@ async function seed() {
     });
 
     try {
-        await Task.deleteMany({ name: { $in: tasksToInsert.map(t => t.name) } }); // prevent duplicates
+        // Delete existing Program assigned tasks to avoid clutter/duplicates when reseeding
+        await Task.deleteMany({ domain: 'Program' });
         await Task.insertMany(tasksToInsert);
-        console.log(`Seeded ${tasksToInsert.length} tasks successfully.`);
+        console.log(`Seeded ${tasksToInsert.length} tasks for Program domain successfully.`);
     } catch (e) {
         console.error(e);
     } finally {

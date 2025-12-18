@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { LogOut, Plus, Users, Layout, Trash2 } from 'lucide-react';
+import { LogOut, Plus, Users, Layout, Trash2, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminDashboard({ user }: { user: any }) {
@@ -12,6 +12,7 @@ export default function AdminDashboard({ user }: { user: any }) {
     const [users, setUsers] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<'tasks' | 'users'>('tasks');
     const [showTaskForm, setShowTaskForm] = useState(false);
+    const [editingTask, setEditingTask] = useState<any | null>(null);
 
     // Form State
     const [newTask, setNewTask] = useState({
@@ -47,11 +48,14 @@ export default function AdminDashboard({ user }: { user: any }) {
         }
     };
 
-    const handleCreateTask = async (e: React.FormEvent) => {
+    const handleCreateOrUpdateTask = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('/api/tasks', {
-                method: 'POST',
+            const url = editingTask ? `/api/tasks/${editingTask._id}` : '/api/tasks';
+            const method = editingTask ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...newTask,
@@ -63,11 +67,41 @@ export default function AdminDashboard({ user }: { user: any }) {
             if (res.ok) {
                 setShowTaskForm(false);
                 setNewTask({ name: '', link: '', tips: '', video: '', images: '', xpReward: 100 });
+                setEditingTask(null);
                 fetchTasks();
             }
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const handleDeleteTask = async (taskId: string) => {
+        if (!confirm('Are you sure you want to delete this task?')) return;
+        try {
+            const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+            if (res.ok) fetchTasks();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleEditClick = (task: any) => {
+        setEditingTask(task);
+        setNewTask({
+            name: task.name,
+            link: task.link || '',
+            tips: task.tips || '',
+            video: task.video || '',
+            images: task.images ? task.images.join(', ') : '',
+            xpReward: task.xpReward
+        });
+        setShowTaskForm(true);
+    };
+
+    const openCreateModal = () => {
+        setEditingTask(null);
+        setNewTask({ name: '', link: '', tips: '', video: '', images: '', xpReward: 100 });
+        setShowTaskForm(true);
     };
 
     return (
@@ -124,7 +158,7 @@ export default function AdminDashboard({ user }: { user: any }) {
                             </div>
                             {activeTab === 'tasks' && (
                                 <button
-                                    onClick={() => setShowTaskForm(true)}
+                                    onClick={openCreateModal}
                                     className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-all"
                                 >
                                     <Plus size={16} className="mr-2" /> Add Task
@@ -141,8 +175,16 @@ export default function AdminDashboard({ user }: { user: any }) {
                                             <h3 className="font-bold">{task.name}</h3>
                                             <p className="text-xs text-gray-400 mt-1">{task.tips || 'No summary'}</p>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-1 rounded font-bold">{task.xpReward} XP</span>
+                                        <div className="text-right flex items-center space-x-3">
+                                            <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2.5 py-1 rounded-full font-bold border border-indigo-500/30">
+                                                {task.xpReward} XP
+                                            </span>
+                                            <button onClick={() => handleEditClick(task)} className="text-gray-400 hover:text-white transition-colors">
+                                                <Pencil size={16} />
+                                            </button>
+                                            <button onClick={() => handleDeleteTask(task._id)} className="text-gray-400 hover:text-red-400 transition-colors">
+                                                <Trash2 size={16} />
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -207,11 +249,11 @@ export default function AdminDashboard({ user }: { user: any }) {
                             className="bg-gray-800 rounded-2xl w-full max-w-lg p-6 border border-gray-700 max-h-[90vh] overflow-y-auto"
                         >
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-bold">New Task for {selectedDomain}</h3>
+                                <h3 className="text-xl font-bold">{editingTask ? 'Edit Task' : `New Task for ${selectedDomain}`}</h3>
                                 <button onClick={() => setShowTaskForm(false)} className="text-gray-400 hover:text-white"><Plus size={24} className="rotate-45" /></button>
                             </div>
 
-                            <form onSubmit={handleCreateTask} className="space-y-4">
+                            <form onSubmit={handleCreateOrUpdateTask} className="space-y-4">
                                 <div>
                                     <label className="block text-sm text-gray-400 mb-1">Task Name</label>
                                     <input required type="text" value={newTask.name} onChange={e => setNewTask({ ...newTask, name: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" />
@@ -238,7 +280,9 @@ export default function AdminDashboard({ user }: { user: any }) {
                                     <label className="block text-sm text-gray-400 mb-1">Images (Comma separated URLs)</label>
                                     <input type="text" value={newTask.images} onChange={e => setNewTask({ ...newTask, images: e.target.value })} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 outline-none focus:border-indigo-500" placeholder="url1, url2" />
                                 </div>
-                                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg mt-4">Create Task</button>
+                                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg mt-4">
+                                    {editingTask ? 'Update Task' : 'Create Task'}
+                                </button>
                             </form>
                         </motion.div>
                     </motion.div>
