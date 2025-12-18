@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
         // Special case for default admin if not exists in DB yet
         if (email === ADMIN_EMAIL) {
-            let adminUser = await User.findOne({ email: ADMIN_EMAIL });
+            let adminUser = await User.findOne({ email: ADMIN_EMAIL }).select('+password');
             if (!adminUser) {
                 // Create the default admin on the fly if he logs in and doesn't exist
                 // SECURITY NOTE: In a real app we might seed this differently, but per requirements
