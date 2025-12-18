@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { LogOut, Trophy, CheckCircle, ExternalLink, PlayCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { ThemeToggle } from './ThemeToggle';
+import UserNavbar from './UserNavbar';
 
 interface Task {
     _id: string;
@@ -66,29 +67,9 @@ export default function InternDashboard({ user }: { user: any }) {
     return (
         <div className="min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
             {/* Navbar */}
-            <nav className="border-b border-border bg-background/50 backdrop-blur-md sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16 items-center">
-                        <div className="flex items-center space-x-3">
-                            <div className="bg-primary p-2 rounded-lg text-primary-foreground">
-                                <span className="font-bold text-xl">IP</span>
-                            </div>
-                            <span className="font-semibold text-lg hidden sm:block">Intern Playbook</span>
-                            <span className="bg-muted text-xs px-2 py-1 rounded text-muted-foreground border border-border">{user.domain} PoD</span>
-                        </div>
-                        <div className="flex items-center space-x-6">
-                            <div className="hidden md:flex flex-col items-end">
-                                <span className="text-sm font-medium">{user.name}</span>
-                                <span className="text-xs text-primary font-bold">{user.xp !== undefined ? user.xp : 0} XP • Lvl {user.xp !== undefined ? Math.floor(user.xp / 500) + 1 : 0}</span>
-                            </div>
-                            <ThemeToggle />
-                            <button onClick={logout} className="text-muted-foreground hover:text-foreground transition-colors">
-                                <LogOut size={20} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+
+            <UserNavbar user={user} />
+
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
