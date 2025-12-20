@@ -39,9 +39,9 @@ export default function UserNavbar({ user }: { user: any }) {
                         {/* Resource Library Link */}
                         <Link
                             href="/resources"
-                            className={`p-2 rounded-lg transition-colors ${pathname === '/resources' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+                            className={`p-2 rounded-lg transition-colors flex items-center gap-2 ${pathname === '/resources' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
                             title="Resource Library"
-                        >
+                        > Library
                             <Book size={20} />
                         </Link>
 
